@@ -812,6 +812,33 @@ set_active_frame(rp_frame *frame, int force_indicator)
 }
 
 void
+move_to_frame(rp_frame *cur, rp_frame *frame)
+{
+	rp_window *win, *last_win;
+
+	if (frame == NULL || frame == cur)
+		return;
+
+	/* Exchange the windows in the frames */
+	win = find_window_number(cur->win_number);
+	last_win = set_frames_window(frame, win);
+	set_frames_window(cur, NULL);
+
+	/* Make sure the windows comes up full screen */
+	if (last_win)
+		maximize(last_win);
+	if (win) {
+		maximize(win);
+		/* Make sure the program bar is always on the top */
+		update_window_names(win->vscreen->screen, defaults.window_fmt);
+	}
+	/* Make the switch */
+	update_last_access(frame);
+
+	set_active_frame(frame, 0);
+}
+
+void
 exchange_with_frame(rp_frame *cur, rp_frame *frame)
 {
 	rp_window *win, *last_win;

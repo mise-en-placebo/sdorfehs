@@ -187,6 +187,10 @@ static cmdret *cmd_delkmap(int interactive, struct cmdarg **args);
 static cmdret *cmd_describekey(int interactive, struct cmdarg **args);
 static cmdret *cmd_echo(int interactive, struct cmdarg **args);
 static cmdret *cmd_escape(int interactive, struct cmdarg **args);
+static cmdret *cmd_movedown(int interactive, struct cmdarg **args);
+static cmdret *cmd_moveleft(int interactive, struct cmdarg **args);
+static cmdret *cmd_moveright(int interactive, struct cmdarg **args);
+static cmdret *cmd_moveup(int interactive, struct cmdarg **args);
 static cmdret *cmd_exchangedown(int interactive, struct cmdarg **args);
 static cmdret *cmd_exchangeleft(int interactive, struct cmdarg **args);
 static cmdret *cmd_exchangeright(int interactive, struct cmdarg **args);
@@ -256,6 +260,7 @@ static cmdret *cmd_smove(int interactive, struct cmdarg **args);
 static cmdret *cmd_source(int interactive, struct cmdarg **args);
 static cmdret *cmd_sselect(int interactive, struct cmdarg **args);
 static cmdret *cmd_stick(int interactive, struct cmdarg **args);
+static cmdret *cmd_moveto(int interactive, struct cmdarg **args);
 static cmdret *cmd_swap(int interactive, struct cmdarg **args);
 static cmdret *cmd_unalias(int interactive, struct cmdarg **args);
 static cmdret *cmd_undefinekey(int interactive, struct cmdarg **args);
@@ -436,6 +441,10 @@ init_user_commands(void)
 	            "Echo: ", arg_RAW);
 	add_command("escape",		cmd_escape,	1, 1, 1,
 	            "Key: ", arg_KEY);
+	add_command("movedown",         cmd_movedown,     0, 0, 0);
+	add_command("moveleft",         cmd_moveleft,     0, 0, 0);
+	add_command("moveright",        cmd_moveright,    0, 0, 0);
+	add_command("moveup",           cmd_moveup,       0, 0, 0);
 	add_command("exchangedown",	cmd_exchangedown, 0, 0, 0);
 	add_command("exchangeleft",	cmd_exchangeleft, 0, 0, 0);
 	add_command("exchangeright",	cmd_exchangeright, 0, 0, 0);
@@ -550,6 +559,9 @@ init_user_commands(void)
 	add_command("sselect",		cmd_sselect,	1, 1, 1,
                     "Screen: ", arg_NUMBER);
 	add_command("stick",		cmd_stick,	0, 0, 0);
+	add_command("moveto",		cmd_moveto,	2, 1, 1,
+	            "destination frame: ", arg_FRAME,
+	            "source frame: ", arg_FRAME);        
 	add_command("swap",		cmd_swap,	2, 1, 1,
 	            "destination frame: ", arg_FRAME,
 	            "source frame: ", arg_FRAME);
@@ -942,10 +954,14 @@ initialize_default_keybindings(void)
 	add_keybinding(XK_S, RP_CONTROL_MASK, "hsplit", map);
 	add_keybinding(XK_Tab, 0, "focus", map);
 	add_keybinding(XK_Tab, RP_META_MASK, "focuslast", map);
-	add_keybinding(XK_Left, RP_CONTROL_MASK, "exchangeleft", map);
-	add_keybinding(XK_Right, RP_CONTROL_MASK, "exchangeright", map);
-	add_keybinding(XK_Up, RP_CONTROL_MASK, "exchangeup", map);
-	add_keybinding(XK_Down, RP_CONTROL_MASK, "exchangedown", map);
+	add_keybinding(XK_Left, RP_CONTROL_MASK, "moveleft", map);
+	add_keybinding(XK_Right, RP_CONTROL_MASK, "moveright", map);
+	add_keybinding(XK_Up, RP_CONTROL_MASK, "moveup", map);
+	add_keybinding(XK_Down, RP_CONTROL_MASK, "movedown", map);
+	add_keybinding(XK_Left, RP_CONTROL_MASK|RP_SHIFT_MASK, "exchangeleft", map);
+	add_keybinding(XK_Right, RP_CONTROL_MASK|RP_SHIFT_MASK, "exchangeright", map);
+	add_keybinding(XK_Up, RP_CONTROL_MASK|RP_SHIFT_MASK, "exchangeup", map);
+	add_keybinding(XK_Down, RP_CONTROL_MASK|RP_SHIFT_MASK, "exchangedown", map);
 	add_keybinding(XK_Left, 0, "focusleft", map);
 	add_keybinding(XK_Right, 0, "focusright", map);
 	add_keybinding(XK_Up, 0, "focusup", map);
@@ -4507,6 +4523,50 @@ cmd_focusright(int interactive, struct cmdarg **args)
 }
 
 cmdret *
+cmd_moveup(int interactive, struct cmdarg **args)
+{
+	rp_frame *frame;
+
+	if ((frame = find_frame_up(current_frame(rp_current_vscreen))))
+		move_to_frame(current_frame(rp_current_vscreen), frame);
+
+	return cmdret_new(RET_SUCCESS, NULL);
+}
+
+cmdret *
+cmd_moveright(int interactive, struct cmdarg **args)
+{
+	rp_frame *frame;
+
+	if ((frame = find_frame_right(current_frame(rp_current_vscreen))))
+		move_to_frame(current_frame(rp_current_vscreen), frame);
+
+	return cmdret_new(RET_SUCCESS, NULL);
+}
+
+cmdret *
+cmd_movedown(int interactive, struct cmdarg **args)
+{
+	rp_frame *frame;
+
+	if ((frame = find_frame_down(current_frame(rp_current_vscreen))))
+		move_to_frame(current_frame(rp_current_vscreen), frame);
+
+	return cmdret_new(RET_SUCCESS, NULL);
+}
+
+cmdret *
+cmd_moveleft(int interactive, struct cmdarg **args)
+{
+	rp_frame *frame;
+
+	if ((frame = find_frame_left(current_frame(rp_current_vscreen))))
+		move_to_frame(current_frame(rp_current_vscreen), frame);
+
+	return cmdret_new(RET_SUCCESS, NULL);
+}
+
+cmdret *
 cmd_exchangeup(int interactive, struct cmdarg **args)
 {
 	rp_frame *frame;
@@ -4546,6 +4606,26 @@ cmd_exchangeright(int interactive, struct cmdarg **args)
 
 	if ((frame = find_frame_right(current_frame(rp_current_vscreen))))
 		exchange_with_frame(current_frame(rp_current_vscreen), frame);
+
+	return cmdret_new(RET_SUCCESS, NULL);
+}
+
+cmdret *
+cmd_moveto(int interactive, struct cmdarg **args)
+{
+	rp_frame *dest_frame;
+	rp_frame *src_frame;
+
+	dest_frame = ARG(0, frame);
+	src_frame = args[1] ? ARG(1, frame) : current_frame(rp_current_vscreen);
+
+	if (!rp_have_xrandr) {
+		if (vscreen_find_frame_by_frame(src_frame->vscreen,
+		    dest_frame) == NULL)
+			return cmdret_new(RET_FAILURE,
+			    "swap: frames on different screens");
+	}
+	move_to_frame(src_frame, dest_frame);
 
 	return cmdret_new(RET_SUCCESS, NULL);
 }
