@@ -106,6 +106,27 @@ Fonts must be specified in Xft format like `set font` such as
 `^fn(noto emoji:size=13)`.
 Resetting to the default font can be done with `^fn()`.
 
+### Focus on click
+
+This fork also enables 'focus follows click'
+functionality. There are many instances in modern programs
+where the interface is not designed for keyboard-driven
+input, e.g., web browsers. It's rare in such programs that
+you would wish to interact with the program solely with the
+mouse. For example, if your browser is not focused, you
+would rarely want to click 'new tab' and then not want to
+input the URL.
+
+To keep with the ratpoison spirit of the project, 'focus
+follows click' functionality is **disabled** by default. You
+can enable it by changing `FOCUS_FOLLOWS_CLICK` to `1` in
+`config.h` when compiling, _or_ executing `set focusonclick
+1` (either from a running sdorfehs instance or via the
+configuration file).
+
+Note that focus will follow _any_ pointer button, with any
+modifiers applied.
+
 ### Gaps
 
 sdorfehs enables a configurable gap (with `set gap`) between frames by
