@@ -186,6 +186,8 @@ init_defaults(void)
 	defaults.frame_indicator_timeout = 1;
 	defaults.frame_resize_unit = 10;
 
+        defaults.focus_on_click = FOCUS_FOLLOWS_CLICK;
+        
 	defaults.padding_left = 20;
 	defaults.padding_right = 20;
 	defaults.padding_top = 20;

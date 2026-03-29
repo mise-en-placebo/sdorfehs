@@ -292,6 +292,8 @@ struct rp_defaults {
 	int frame_indicator_timeout;
 	int frame_resize_unit;
 
+        int focus_on_click;
+
 	int padding_left;
 	int padding_right;
 	int padding_top;

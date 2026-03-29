@@ -25,6 +25,9 @@
 
 #define PROGNAME	"sdorfehs"
 
+/* Enable focus follows mouse click */
+#define FOCUS_FOLLOWS_CLICK 0
+
 /* Enter command mode with Control+a by default. */
 #define KEY_PREFIX      XK_a
 #define MODIFIER_PREFIX RP_CONTROL_MASK
