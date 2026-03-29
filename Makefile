@@ -1,8 +1,4 @@
-VERSION=	1.7
-
-VERSION!=	[ -d .git ] && \
-		echo "git-`git rev-list --abbrev-commit --tags --max-count=1`" || \
-		echo "${VERSION}"
+VERSION=	1.9
 
 CC?=		cc
 PREFIX?=	/usr/local

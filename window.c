@@ -202,6 +202,10 @@ add_to_window_list(rp_screen *s, Window w)
 
 	XSelectInput(dpy, new_window->w, WIN_EVENTS);
 
+        XGrabButton (dpy, AnyButton, AnyModifier, new_window->w,
+                     True, ButtonPressMask, GrabModeSync,
+                     GrabModeAsync, None, None);
+
 	new_window->user_name = xstrdup("Unnamed");
 
 	new_window->wm_name = NULL;

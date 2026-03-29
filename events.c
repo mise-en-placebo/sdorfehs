@@ -1,3 +1,4 @@
+
 /*
  * X events
  * Copyright (C) 2000, 2001, 2002, 2003, 2004 Shawn Betts <sabetts@vcn.bc.ca>
@@ -515,14 +516,32 @@ static void
 button_press(XEvent *ev)
 {
 	rp_screen *s;
+        rp_frame  *frame;
+	rp_window *win;
+        
 	XButtonEvent *xbe = (XButtonEvent *)ev;
 
 	s = rp_current_screen;
 	if (!s)
 		return;
 
-	if (xbe->window == s->bar_window)
+	if (xbe->window == s->bar_window) {
 		bar_handle_click(s, xbe);
+
+                return;
+        }
+
+	win = find_window_in_list(xbe->window, &rp_mapped_window);
+        
+        frame = find_windows_frame(win);
+        
+        set_active_frame(frame, 0);
+
+        XAllowEvents(dpy, ReplayPointer, xbe->time);
+
+        XFlush(dpy);
+
+        return;
 }
 
 static void
@@ -771,7 +790,7 @@ delegate_event(XEvent *ev)
 
 	case ButtonPress:
 		PRINT_DEBUG(("--- Handling ButtonPress ---\n"));
-		button_press(ev);
+                button_press(ev);
 		break;
 
 	case UnmapNotify:
