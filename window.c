@@ -43,6 +43,32 @@ get_mouse_position(rp_window *win, int *mouse_x, int *mouse_y)
 }
 
 void
+update_window_inputs(rp_window *win)
+{
+  if (defaults.focus_on_click) {
+    XGrabButton (dpy, AnyButton, AnyModifier, win->w,
+                 True, ButtonPressMask, GrabModeSync,
+                 GrabModeAsync, None, None);
+  } else {
+    XUngrabButton (dpy, AnyButton, AnyModifier, win->w);
+  }    
+}
+
+void
+update_windows_inputs(void)
+{
+  rp_window  *win;
+                
+  list_for_each_entry(win, &rp_mapped_window, node) {
+    update_window_inputs(win);
+  }
+
+  list_for_each_entry(win, &rp_unmapped_window, node) {
+    update_window_inputs(win);
+  }  
+}
+
+void
 free_window(rp_window *w)
 {
 	if (w == NULL)
@@ -202,9 +228,11 @@ add_to_window_list(rp_screen *s, Window w)
 
 	XSelectInput(dpy, new_window->w, WIN_EVENTS);
 
-        XGrabButton (dpy, AnyButton, AnyModifier, new_window->w,
-                     True, ButtonPressMask, GrabModeSync,
-                     GrabModeAsync, None, None);
+        if (defaults.focus_on_click) {
+          XGrabButton (dpy, AnyButton, AnyModifier, new_window->w,
+                       True, ButtonPressMask, GrabModeSync,
+                       GrabModeAsync, None, None);
+        }
 
 	new_window->user_name = xstrdup("Unnamed");
 

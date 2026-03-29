@@ -22,6 +22,8 @@
 
 #include "sbuf.h"
 
+void update_window_inputs(rp_window *w);
+void update_windows_inputs(void);
 void free_window(rp_window *w);
 rp_window *add_to_window_list(rp_screen *s, Window w);
 void last_window(void);
