@@ -135,6 +135,7 @@ static cmdret *set_bgcolor(struct cmdarg **args);
 static cmdret *set_border(struct cmdarg **args);
 static cmdret *set_bwcolor(struct cmdarg **args);
 static cmdret *set_fgcolor(struct cmdarg **args);
+static cmdret *set_focusonclick(struct cmdarg **args);
 static cmdret *set_font(struct cmdarg **args);
 static cmdret *set_framefmt(struct cmdarg **args);
 static cmdret *set_framemsgwait(struct cmdarg **args);
@@ -329,6 +330,7 @@ init_set_vars(void)
 	add_set_var("border", set_border, 1, "", arg_NUMBER);
 	add_set_var("bwcolor", set_bwcolor, 1, "", arg_STRING);
 	add_set_var("fgcolor", set_fgcolor, 1, "", arg_STRING);
+        add_set_var("focusonclick", set_focusonclick, 1, "", arg_NUMBER);
 	add_set_var("font", set_font, 1, "", arg_STRING);
 	add_set_var("framefmt", set_framefmt, 1, "", arg_REST);
 	add_set_var("framemsgwait", set_framemsgwait, 1, "", arg_NUMBER);
@@ -3605,6 +3607,23 @@ cmd_help(int interactive, struct cmdarg **args)
 		return ret;
 	}
 
+	return cmdret_new(RET_SUCCESS, NULL);
+}
+
+cmdret *
+set_focusonclick(struct cmdarg **args)
+{
+	if (args[0] == NULL)
+		return cmdret_new(RET_SUCCESS, "%d", defaults.focus_on_click);
+
+	if (ARG(0, number) != 0 && ARG(0, number) != 1)
+		return cmdret_new(RET_FAILURE,
+		    "set focusonclick: invalid argument");
+
+	defaults.focus_on_click = ARG(0, number);
+
+        update_windows_inputs();
+        
 	return cmdret_new(RET_SUCCESS, NULL);
 }
 
